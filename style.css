@@ -1245,6 +1245,7 @@ img{
 /* TESTIMONIAL */
 /*--------------------*/
 
+
 #testimonial {
   background-attachment: fixed !important;
   background-image: url("assets/images/testimonial-1.jpg");
@@ -1283,16 +1284,14 @@ img{
 }
 
 .testimonial-img {
-  border-radius: 50%;
-  height: 100px;
+  height: 150px;
   margin: 0 auto 30px;
   text-align: center;
-  width: 100px;
+  width: 250px;
 }
 
-.testimonial-img img{
+.testimonial-img img, iframe{
 	width: 100%;
-	border-radius: 50%;
 }
 
 .testimonial-content{}
