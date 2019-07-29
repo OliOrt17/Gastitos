@@ -1,17 +1,18 @@
 <?php
-  require_once '../includes/_db.php';
-  require_once '../includes/_funciones.php';
-  session_start();
-  global $db;
+require_once '../includes/_db.php';
+require_once '../includes/_funciones.php';
 
-  if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
-    echo "Sesion no iniciada";
-    header('Location: ../index.html');
-    return false;
-    exit();
-  }else{
+session_start();
+global $db;
+
+if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
+  echo "Sesion no iniciada";
+  header('Location: ../');
+  return false;
+  exit();
+}else{
   $u_id=$_COOKIE['lau'];
-  }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -79,16 +80,21 @@
         <div class="sidebar-header d-flex align-items-center">
           <div class="avatar"><img src="img/avatar-6.jpg" alt="..." class="img-fluid rounded-circle"></div>
           <div class="title">
-            <h1 class="h5">Mark Stephen</h1>
-            <p>Web Designer</p>
+            <h1 class="h5"><?php $id=$_SESSION['USR_ID'];
+              $usr = $db->select("usuarios","*",["usr_id"=>$id]);
+               foreach($usr as $key => $usr){
+                 echo $usr["usr_nom"];
+               }
+              ?></h1>
+          
           </div>
         </div>
         <!-- Sidebar Navidation Menus--><span class="heading">Modulos</span>
         <ul class="list-unstyled">
           <li class="active"><a href="index.php"> <i class="icon-home"></i>Inicio </a></li>
-          <li><a href="#"> <i class="icon-user"></i>Usuarios </a></li>
-          <li><a href="#"> <i class="icon-computer"></i>Categorias </a></li>
-          <li><a href="#"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
+          <li><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
+          <li><a href="categorias.php"> <i class="icon-computer"></i>Categorias </a></li>
+          <li><a href="transacciones.php"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
       </nav>
       <!-- Sidebar Navigation end-->
       <div class="page-content">
@@ -106,10 +112,16 @@
                     <div class="title">
                       <div class="icon"><i class="icon-user-1"></i></div><strong>Usuarios</strong>
                     </div>
-                    <div class="number dashtext-1">27</div>
+                    <div class="number dashtext-1"><?php $id=$_SESSION['USR_ID'];
+              $usr = $db->count("usuarios","*");
+               echo $usr;
+               ?></div>
                   </div>
                   <div class="progress progress-template">
-                    <div role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
+                    <div role="progressbar" style="width: <?php $id=$_SESSION['USR_ID'];
+              $usr = $db->count("usuarios","*");
+               echo $usr."%";
+               ?>" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
                   </div>
                 </div>
               </div>
@@ -174,8 +186,8 @@
     <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
     <script src="js/charts-home.js"></script>
     <script src="js/front.js"></script>
-    <<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
-    <script src="../js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+    <script src="js/main.js"></script>
     
   </body>
 </html>
