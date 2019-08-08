@@ -1,7 +1,37 @@
+<?php
+require_once 'includes/_db.php';
+require_once 'includes/_funciones.php';
+global $db;
+
+
+try{
+$token = $_GET['token'];
+if($token == null){
+header("Location: index.php");       
+}
+
+$consultar = $db -> get("usuarios","*",["AND" => [ "token"=> $token]]);        
+$nom = $consultar["usr_nom"];
+$user = $consultar["usr_email"]; 
+$num=$consultar["usr_id"];    
+
+if(!$consultar){    
+header("Location: index.php");   
+}
+
+}
+catch(Exception $e){
+header("Location: index.php");   
+}
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Login</title>
+	<title>Gastitos</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->	
@@ -36,6 +66,8 @@
 					</span>
 			
                     <div class="wrap-input100 validate-input" data-validate = "Password is required">
+						<input id="num" type="text" class=" form-control-lg" placeholder="User" aria-label="Username" aria-describedby="basic-addon1" required="0" hidden="1" value="<?php echo $num?>">
+                                    
 						<input id="password" class="input100" type="password" name="pass" placeholder="Password">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
@@ -76,8 +108,9 @@
 		})
 	</script>
 <!--===============================================================================================-->
-	<script src="js/main.js"></script>
-	<script src="js/notify.min.js"></script>
+	<script src="dashboard/js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+	
 
 </body>
 </html>

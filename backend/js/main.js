@@ -166,7 +166,6 @@
     //comentario
     $("#comentario").on("click",function(e){
         e.preventDefault();
-        alert("lffdkjl");
         let nom=$("#nom").val();
         let email=$("#email").val();
         let asunto=$("#asunto").val();
@@ -243,7 +242,7 @@
                     'Presione el boton!',
                     'success'
                   )
-                  setTimeout(function(){ location.href='../index.html'; }, 10000);
+                  location.href='../index.html';
                 }else{
                     Swal.fire({
                         type: 'error',
@@ -254,5 +253,115 @@
             }
         })
     });
+
+    //BOTON ACTIVAR FORMULARIO
+    $("#nuevo").click(function(){
+        
+        $("#modal").modal("show");
+        $("#formulario").trigger("reset");
+  });
+
+  //cambiar el status de usuarios
+  $("#table_datos").on("change",".estatus_check",function(){
+      
+    let id=$(this).data("id");
+    
+    let obj={
+        "accion":"cambiar_status",
+        "id" : id
+    }
+
+    $.ajax({
+        url:"../includes/_funciones.php",
+        datatype: "json",
+        type: "post",
+        data: obj,
+        success: function(data){
+            if(data==1){
+                alert("jsjsjh");
+            }else{
+                alert("yyuuy");
+            }
+        }
+    })
+  });
+
+  //usuarios
+  $(".btn1").click(function(){
+      alert("klsksjjlkd");
+  });
+  $(".eliminar_usr").on("click", function(e){
+      e.preventDefault();
+
+    let id=$(this).data("id");
+    let obj = {
+          "accion" : "eliminar_usr",
+          "id" : id
+      }
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: "../includes/_funciones.php",
+                type: "POST",
+                dataType: "json",
+                data: obj,
+                success: function(data){
+                    if(data==1){
+                        Swal.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        )
+                        mostrar_usr();
+                    }
+                }
+            })
+         
+        }
+      })
+  });
+    function mostrar_usr(){
+        let obj = {
+        "accion" : "mostrar_usr"
+        }
+        
+        $.post("../includes/_funciones.php",obj, function(data){
+        let template = ``; 
+        $.each(data, function(e,elem){
+            template += `
+            <tr>
+            <td>${elem.usr_nom}</td>
+            <td>${elem.usr_email}</td>
+            <td>${elem.usr_fechai}</td>
+            <td> 
+            <?php 
+                if($usr["usr_status"]==1){
+                 echo '<a id="status_usr" href="#"> <i class="fa fa-circle" aria-hidden="true" style="color:green" ></i></a>';
+                } else if($usr["usr_status"]==0){
+                     echo '<a id="status_usr" href="#"><i class="fa fa-circle" aria-hidden="true" style="color:red" ></i></a>';
+                }  
+            ?>
+          </td>
+            <td>
+            <a href="#" class="editar_usr"data-id="${elem.usr_id}"><i class="fas fa-edit"></i></a>
+            </td>
+        <td>
+            <a href="#" class="eliminar_usr" data-id="${elem.usr_id}"><i class="fas fa-trash"></i></a></td>
+            </tr>
+            `;
+        });
+        $("#table_datos tbody").html(template);
+        },"JSON");      
+    }
+  
+  
     
 })(jQuery);

@@ -4,7 +4,6 @@ require_once '../includes/_funciones.php';
 
 session_start();
 global $db;
-
 if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   echo "Sesion no iniciada";
   header('Location: ../index.html');
@@ -12,14 +11,17 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   exit();
 }else{
   $u_id=$_COOKIE['lau'];
+  
+  $id=$_SESSION['USR_ID'];
 }
+
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Sistemita | Admins</title>
+    <title>Gastitos | Transacciones</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -49,11 +51,12 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
         <nav class="navbar navbar-expand-lg">
           <div class="search-panel">
             <div class="search-inner d-flex align-items-center justify-content-center">
-              <div class="close-btn">Cerrar <i class="fa fa-close"></i></div>
+              <div class="close-btn">Cerrar <i class="fa fa-close"></i>   </div>
               <form id="searchForm" action="#">
                 <div class="form-group">
                   <input type="search" name="search" placeholder="¿Que estas buscando?...">
                   <button type="submit" class="submit">Buscar</button>
+                  
                 </div>
               </form>
             </div>
@@ -81,9 +84,14 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
         <nav id="sidebar">
           <!-- Sidebar Header-->
           <div class="sidebar-header d-flex align-items-center">
-            <div class="avatar"><img src="img/avatar-6.jpg" alt="..." class="img-fluid rounded-circle"></div>
+            <div class="avatar"><img src="<?php 
+              $usr = $db->select("usuarios","*",["usr_id"=>$id]);
+               foreach($usr as $key => $usr){
+                 echo $usr["usr_foto"];
+               }
+              ?>" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
-            <h1 class="h5"><?php $id=$_SESSION['USR_ID'];
+            <h1 class="h5"><?php 
               $usr = $db->select("usuarios","*",["usr_id"=>$id]);
                foreach($usr as $key => $usr){
                  echo $usr["usr_nom"];
@@ -94,23 +102,30 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           <!-- Sidebar Navidation Menus--><span class="heading">Modulos</span>
           <ul class="list-unstyled">
             <li><a href="index.php"> <i class="icon-home"></i>Inicio </a></li>
-            <li class="active"><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
+            <li ><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
             <li><a href="categorias.php"> <i class="icon-computer"></i>Categorias </a></li>
-            <li><a href="transacciones.php"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
+            <li class="active"><a href="transacciones.php"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
         </nav>
         <!-- Sidebar Navigation end-->
         <div class="page-content">
           <!-- Page Header-->
           <div class="page-header no-margin-bottom">
             <div class="container-fluid">
-              <h2 class="h5 no-margin-bottom">Usuarios</h2>
+              <h6 class="h5 no-margin-bottom"><?php
+ 
+ $meses = array(1 => 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+  $mes=date('n');
+ echo date('j'). ' ' .$meses[date('n')] . ' de ' . date('Y');?></h6>
+
+              
             </div>
           </div>
           <!-- Breadcrumb-->
           <div class="container-fluid">
             <ul class="breadcrumb">
-              <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-              <li class="breadcrumb-item active">Usuarios        </li>
+              <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
+              <li class="breadcrumb-item active">Transacciones        </li>
             </ul>
           </div>
           <section class="no-padding-top">
@@ -119,43 +134,66 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                 <div class="col-lg-12">
                   <div class="block">
                     <div class="title">
-                      <strong>Usuarios &nbsp; &nbsp;</strong>
+                      <strong>Transacciones &nbsp; &nbsp;</strong>
                       <button id="nuevo" type="button" class="btn btn-primary">Nuevo</button>
                     </div>
                     <div class="table-responsive">
                       <table class="table table-striped table-hover" id="table_datos">
                         <thead>
                           <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Fecha de Alta</th>
-                            <th>Status</th>
+                            <th>Tipo</th>
+                            <th>Categoria</th>
+                            <th>Descripcion</th>
+                            <th>Cantidad</th>
+                            <th>Fecha</th>
                             <th>Editar</th>
                             <th>Eliminar</th>
                           </tr>
                         </thead>
                         <tbody>
                           <?php
-                            $usr = $db->select("usuarios","*");
-                              foreach($usr as $key => $usr){
+                            $trs = $db->select("transacciones",
+                            [
+                              "[>]categorias"=>"cat_id",
+                              "[>]usuarios"=>"usr_id"
+
+                            ],
+                            [
+                              "transacciones.trs_id",
+                              "transacciones.trs_tipo",
+                              "transacciones.trs_descripcion",
+                              "transacciones.trs_cantidad",
+                              "transacciones.trs_fechai",
+                              
+                              "transacciones.tps_id",
+                              "categorias.cat_id",
+                              "categorias.cat_nom",
+                              "usuarios.usr_id"],
+                              ["usuarios.usr_id"=>$id,"ORDER"=>"transacciones.trs_fechai"
+
+                            ]);
+
+                            foreach($trs as $key => $trs){
                                 
                           ?>
                          
                           <tr>
-                            <td><?php echo $usr["usr_nom"];?></td>
-                            <td><?php echo $usr["usr_email"];?></td>
-                            <td><?php echo $usr["usr_fechai"];?></td>
-                            <th>
-                            <!--<input type="checkbox" class="js-switch" checked />!-->
-                            <label> <input type="checkbox" id="status_usr" class="get_value" value="<?php echo $usr["usr_id"]?> "></label>
-                            </th>
+                            <td><?php echo $trs["cat_nom"];?></td>
+                            <td><?php if($trs["tps_id"]==1){
+                              echo "Ingresos";
+                            }else{
+                              echo "Gastos";
+                            }?></td>
+                            <td><?php echo $trs["trs_descripcion"];?></td>
+                            <th><?php echo $trs["trs_cantidad"];?></th>
+                            <th><?php echo $trs["trs_fechai"];?></th>
                             <td>
-                              <a href="#" class="editar_usr" data-id="<?php echo $usr["usr_id"];?>">
+                              <a href="#" class="editar_trs" data-id="<?php echo $trs["trs_id"];?>">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                               </a>
                             </td>
                             <td>
-                              <a href="#" class="eliminar_usr" data-id="<?php echo $usr["usr_id"];?>">
+                              <a href="#" class="eliminar_trs" data-id="<?php echo $trs["trs_id"];?>">
                               <i class="fa fa-trash-o" aria-hidden="true"></i>
                               </a>
                             </td>
@@ -209,29 +247,56 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
 <div id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
   <div role="document" class="modal-dialog">
     <div id="registro-content"class="modal-content">
-      <div class="modal-header"><strong id="exampleModalLabel" class="modal-title">Agregar Usuarios</strong>
+      <div class="modal-header"><strong id="exampleModalLabel" class="modal-title">Agregar Transacciones</strong>
         <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body">
         <p></p>
         <form id="formulario">
           <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" id="nom" placeholder="Nombre" class="form-control">
+            <label>Tipo</label>
+            <input id="num" type="text" class=" form-control-lg" placeholder="User" aria-label="Username" aria-describedby="basic-addon1" required="0" hidden="1" value="<?php echo $id?>">
+            <select id="tipo" class="form-control">
+            
+                   <option value="0">Seleccionar tipo</option>
+                    <?php 
+                            $cat = $db->select("categorias","*"); 
+                            foreach ($cat as $key => $cat) {
+                        ?>
+                                <option data-categoria="<?php echo $cat["tps_id"]?>" value="<?php echo $cat["cat_id"]?>"><?php echo $cat["cat_nom"]?></option>
+                        <?php
+                            }
+                        ?>
+                   </select>
+          </div>
+          <div class="form-group" >
+          <label>Categoria</label>
+            <select id="categoria"  class="form-control" disabled>
+            
+                   <option value="0">Seleccionar Categoria</option>
+                    <?php 
+                            $cat = $db->select("tipos","*"); 
+                            foreach ($cat as $key => $cat) {
+                        ?>
+                                <option  value="<?php echo $cat["tps_id"]?>"><?php echo $cat["tps_nom"]?></option>
+                        <?php
+                            }
+                        ?>
+                   </select>
           </div>
           <div class="form-group">
-            <label>Email</label>
-            <input type="email"  id="email" placeholder="Email" class="form-control">
+            <label>Cantidad</label>
+            <input type="number" value="0" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" class="form-control currency" id="cantidad" />
           </div>
           <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="pass" placeholder="Password" class="form-control">
+            <label>Descripcion</label>
+            <input type="text" id="descripcion" placeholder="Tipo" class="form-control">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-secondary">Cancelar</button>
-        <button type="button" id="guardar_usr" class="btn btn-primary">Guardar</button>
+        <button type="button" id="guardar_trs" class="btn btn-primary">Guardar</button>
       </div>
     </div>
   </div>

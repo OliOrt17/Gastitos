@@ -4,7 +4,6 @@ require_once '../includes/_funciones.php';
 
 session_start();
 global $db;
-
 if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   echo "Sesion no iniciada";
   header('Location: ../index.html');
@@ -12,14 +11,17 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   exit();
 }else{
   $u_id=$_COOKIE['lau'];
+  
+  $id=$_SESSION['USR_ID'];
 }
+
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Sistemita | Admins</title>
+    <title>Gastitos | Categorias</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -81,7 +83,12 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
         <nav id="sidebar">
           <!-- Sidebar Header-->
           <div class="sidebar-header d-flex align-items-center">
-            <div class="avatar"><img src="img/avatar-6.jpg" alt="..." class="img-fluid rounded-circle"></div>
+            <div class="avatar"><img src="<?php 
+              $usr = $db->select("usuarios","*",["usr_id"=>$id]);
+               foreach($usr as $key => $usr){
+                 echo $usr["usr_foto"];
+               }
+              ?>" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
             <h1 class="h5"><?php $id=$_SESSION['USR_ID'];
               $usr = $db->select("usuarios","*",["usr_id"=>$id]);
@@ -94,8 +101,8 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           <!-- Sidebar Navidation Menus--><span class="heading">Modulos</span>
           <ul class="list-unstyled">
             <li><a href="index.php"> <i class="icon-home"></i>Inicio </a></li>
-            <li class="active"><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
-            <li><a href="categorias.php"> <i class="icon-computer"></i>Categorias </a></li>
+            <li><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
+            <li class="active"><a href="categorias.php"> <i class="icon-computer"></i>Categorias </a></li>
             <li><a href="transacciones.php"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
         </nav>
         <!-- Sidebar Navigation end-->
@@ -109,7 +116,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           <!-- Breadcrumb-->
           <div class="container-fluid">
             <ul class="breadcrumb">
-              <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+              <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
               <li class="breadcrumb-item active">Categorias       </li>
             </ul>
           </div>
@@ -136,14 +143,16 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         <tbody>
                           <?php
                             
-                            $cat = $db->select("categorias","*");
+                            $cat = $db->select("categorias",[
+                              "[>]tipos"=>"tps_id"],["categorias.cat_id",
+                              "categorias.cat_nom","categorias.cat_fechai","tipos.tps_id","tipos.tps_nom"]);
                               foreach($cat as $key => $cat){
                                 
                           ?>
                          
                           <tr>
                             <td><?php echo $cat["cat_nom"];?></td>
-                            <td><?php echo $cat["cat_tipo"];?></td>
+                            <td><?php echo $cat["tps_nom"];?></td>
                             <td><?php echo $cat["cat_fechai"];?></td>
                             <td>
                               <a href="#" class="editar_cat" data-id="<?php echo $cat["cat_id"];?>">
@@ -219,9 +228,14 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
             <label>Tipo</label>
             <select id="lista" class="form-control">
                 <option value="0">Seleccionar categoria</option>
-                <option value="Ingreso">Ingreso</option>
-                <option value="Gasto">Gastos</option>
-
+                <?php 
+                            $cat = $db->select("tipos","*"); 
+                            foreach ($cat as $key => $cat) {
+                        ?>
+                                <option value="<?php echo $cat["tps_id"]?>"><?php echo $cat["tps_nom"]?></option>
+                        <?php
+                            }
+                        ?>
             </select>
           </div>
         </form>

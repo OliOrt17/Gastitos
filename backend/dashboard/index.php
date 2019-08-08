@@ -2,24 +2,27 @@
 require_once '../includes/_db.php';
 require_once '../includes/_funciones.php';
 
+
 session_start();
 global $db;
-
 if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   echo "Sesion no iniciada";
-  header('Location: ../');
+  header('Location: ../index.html');
   return false;
   exit();
 }else{
   $u_id=$_COOKIE['lau'];
+  
+  $id=$_SESSION['USR_ID'];
 }
+
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Sistemita | Inicio </title>
+    <title>Gastitos | Inicio </title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -78,7 +81,12 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
       <nav id="sidebar">
         <!-- Sidebar Header-->
         <div class="sidebar-header d-flex align-items-center">
-          <div class="avatar"><img src="img/avatar-6.jpg" alt="..." class="img-fluid rounded-circle"></div>
+          <div class="avatar"><img src="<?php 
+              $usr = $db->select("usuarios","*",["usr_id"=>$id]);
+               foreach($usr as $key => $usr){
+                 echo $usr["usr_foto"];
+               }
+              ?>" alt="..." class="img-fluid rounded-circle"></div>
           <div class="title">
             <h1 class="h5"><?php $id=$_SESSION['USR_ID'];
               $usr = $db->select("usuarios","*",["usr_id"=>$id]);
@@ -112,13 +120,13 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                     <div class="title">
                       <div class="icon"><i class="icon-user-1"></i></div><strong>Usuarios</strong>
                     </div>
-                    <div class="number dashtext-1"><?php $id=$_SESSION['USR_ID'];
+                    <div class="number dashtext-1"><?php 
               $usr = $db->count("usuarios","*");
                echo $usr;
                ?></div>
                   </div>
                   <div class="progress progress-template">
-                    <div role="progressbar" style="width: <?php $id=$_SESSION['USR_ID'];
+                    <div role="progressbar" style="width: <?php 
               $usr = $db->count("usuarios","*");
                echo $usr."%";
                ?>" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
@@ -131,7 +139,8 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                     <div class="title">
                       <div class="icon"><i class="icon-contract"></i></div><strong>Ingresos</strong>
                     </div>
-                    <div class="number dashtext-2">375</div>
+                    <div class="number dashtext-2"><?php $trs=$db->sum("transacciones","trs_cantidad",["tps_id"=>1,"usr_id"=>$id]);
+                    echo round($trs,2);?></div>
                   </div>
                   <div class="progress progress-template">
                     <div role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-2"></div>
@@ -144,7 +153,8 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                     <div class="title">
                       <div class="icon"><i class="icon-paper-and-pencil"></i></div><strong>Gastos</strong>
                     </div>
-                    <div class="number dashtext-3">140</div>
+                    <div class="number dashtext-3"><?php $t=$db->sum("transacciones","trs_cantidad",["tps_id"=>2,"usr_id"=>$id]);
+                    echo round($t,2);?></div>
                   </div>
                   <div class="progress progress-template">
                     <div role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-3"></div>
@@ -157,16 +167,160 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                     <div class="title">
                       <div class="icon"><i class="icon-writing-whiteboard"></i></div><strong>Balance</strong>
                     </div>
-                    <div class="number dashtext-4">41</div>
+                    <div class="number dashtext-4"><?php $result=round($trs-$t,2);
+                    if($result>0){echo "<font color='greed'>".$result."</font>";}else{echo "<font color='red'>".$result."</font>";}?> </div>
                   </div>
                   <div class="progress progress-template">
-                    <div role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-4"></div>
+                    <div role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template "></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
+      
+        <section class="no-padding-top">
+            <div class="container-fluid">
+              <div class="row">
+                <!--Ingreso-->
+                <div class="col-lg-6 col-md-12">
+                <div class="title">
+                  <h2> &nbsp; &nbsp;    &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; Ingresos  &nbsp; <button id="nuevo" type="button" class="btn btn-primary">Nuevo</button></h2>
+                     
+                    </div>
+                   
+                    <br>
+                  <div class="block">
+                    <div class="table-responsive">
+                      <table class="table table-striped table-hover" id="table_datos">
+                        <thead>
+                          <tr>
+                            <th>Categoria</th>
+                            <th>Monto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                            $trs = $db->select("transacciones",
+                            [
+                              "[>]categorias"=>"cat_id",
+                              "[>]usuarios"=>"usr_id"
+
+                            ],
+                            [
+                              "transacciones.trs_id",
+                              "transacciones.trs_tipo",
+                              "transacciones.trs_descripcion",
+                              "transacciones.trs_cantidad",
+                              "transacciones.trs_fechai",
+                              "transacciones.tps_id",
+
+                              "categorias.cat_id",
+                              "categorias.cat_nom",
+                              "usuarios.usr_id"],
+                              ["usuarios.usr_id"=>$id,"transacciones.tps_id"=>1
+
+                            ]);
+
+                            foreach($trs as $key => $trs){
+                                
+                          ?>
+                         
+                          <tr>
+                            <td><?php echo $trs["cat_nom"]."-".$trs["trs_descripcion"];?></td>
+                            <th><?php echo $trs["trs_cantidad"];?></th>
+                          </tr>
+                          <?php
+                          }
+                          /*<tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">3</th>
+                            <td>Larry</td>
+                            <td>the Bird</td>
+                            <td>@twitter       </td>
+                          </tr>*/
+                           ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!--Gastos-->
+                <div class="col-lg-6 col-md-12">
+                <div class="title">
+                  <h2> &nbsp; &nbsp;    &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; Gastos &nbsp; <button id="nuevo_gas" type="button" class="btn btn-primary">Nuevo</button></h2>
+                     
+                    </div>
+                   
+                    <br>
+                  <div class="block">
+                    <div class="table-responsive">
+                      <table class="table table-striped table-hover" id="table_datos">
+                        <thead>
+                          <tr>
+                            <th>Categoria</th>
+                            <th>Monto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                            $trs = $db->select("transacciones",
+                            [
+                              "[>]categorias"=>"cat_id",
+                              "[>]usuarios"=>"usr_id"
+
+                            ],
+                            [
+                              "transacciones.trs_id",
+                              "transacciones.trs_tipo",
+                              "transacciones.trs_descripcion",
+                              "transacciones.trs_cantidad",
+                              "transacciones.trs_fechai",
+                              "transacciones.tps_id",
+
+                              "categorias.cat_id",
+                              "categorias.cat_nom",
+                              "usuarios.usr_id"],
+                              ["usuarios.usr_id"=>$id, "transacciones.tps_id"=>2
+
+                            ]);
+
+                            foreach($trs as $key => $trs){
+                                
+                          ?>
+                         
+                          <tr>
+                            <td><?php echo $trs["cat_nom"]."-".$trs["trs_descripcion"];?></td>
+                            <th><?php echo $trs["trs_cantidad"];?></th>
+                          </tr>
+                          <?php
+                          }
+                          /*<tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">3</th>
+                            <td>Larry</td>
+                            <td>the Bird</td>
+                            <td>@twitter       </td>
+                          </tr>*/
+                           ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         <footer class="footer">
           <div class="footer__block block no-margin-bottom">
             <div class="container-fluid text-center">
@@ -191,3 +345,92 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
     
   </body>
 </html>
+<!-- Modal-->
+<div id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+  <div role="document" class="modal-dialog">
+    <div id="registro-content"class="modal-content">
+      <div class="modal-header"><strong id="exampleModalLabel" class="modal-title">Agregar Ingresos</strong>
+        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body">
+        <p></p>
+        <form id="formulario">
+          <div class="form-group">
+            <label>Tipo</label>
+            <input id="num" type="text" class=" form-control-lg" placeholder="User" aria-label="Username" aria-describedby="basic-addon1" required="0" hidden="1" value="<?php echo $id?>">
+            <select id="tipo" class="form-control">
+            
+                   <option value="0">Seleccionar tipo</option>
+                    <?php 
+                            $cat = $db->select("categorias","*",["tps_id"=>1]); 
+                            foreach ($cat as $key => $cat) {
+                        ?>
+                                <option  value="<?php echo $cat["cat_id"]?>"><?php echo $cat["cat_nom"]?></option>
+                        <?php
+                            }
+                        ?>
+                   </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Cantidad</label>
+            <input type="number" value="0" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" class="form-control currency" id="cantidad" />
+          </div>
+          <div class="form-group">
+            <label>Descripcion</label>
+            <input type="text" id="descripcion" placeholder="Tipo" class="form-control">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-secondary">Cancelar</button>
+        <button type="button" id="guardar_ing" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal-->
+<div id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+  <div role="document" class="modal-dialog">
+    <div id="registro-content"class="modal-content">
+      <div class="modal-header"><strong id="exampleModalLabel" class="modal-title">Agregar Gastos</strong>
+        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body">
+        <p></p>
+        <form id="formulario">
+          <div class="form-group">
+            <label>Tipo</label>
+            <input id="num" type="text" class=" form-control-lg" placeholder="User" aria-label="Username" aria-describedby="basic-addon1" required="0" hidden="1" value="<?php echo $id?>">
+            <select id="tipo1" class="form-control">
+            
+                   <option value="0">Seleccionar tipo</option>
+                    <?php 
+                            $cat = $db->select("categorias","*",["tps_id"=>2]); 
+                            foreach ($cat as $key => $cat) {
+                        ?>
+                                <option  value="<?php echo $cat["cat_id"]?>"><?php echo $cat["cat_nom"]?></option>
+                        <?php
+                            }
+                        ?>
+                   </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Cantidad</label>
+            <input type="number" value="0" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" class="form-control currency" id="cantidad1" />
+          </div>
+          <div class="form-group">
+            <label>Descripcion</label>
+            <input type="text" id="descripcion1" placeholder="Tipo" class="form-control">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-secondary">Cancelar</button>
+        <button type="button" id="guardar_gas" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>

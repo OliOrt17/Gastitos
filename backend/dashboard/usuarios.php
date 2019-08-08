@@ -2,9 +2,9 @@
 require_once '../includes/_db.php';
 require_once '../includes/_funciones.php';
 
+
 session_start();
 global $db;
-
 if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   echo "Sesion no iniciada";
   header('Location: ../index.html');
@@ -12,14 +12,17 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   exit();
 }else{
   $u_id=$_COOKIE['lau'];
+  
+  $id=$_SESSION['USR_ID'];
 }
+
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Sistemita | Admins</title>
+    <title>Gastitos | Usuarios</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -81,9 +84,14 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
         <nav id="sidebar">
           <!-- Sidebar Header-->
           <div class="sidebar-header d-flex align-items-center">
-            <div class="avatar"><img src="img/avatar-6.jpg" alt="..." class="img-fluid rounded-circle"></div>
+            <div class="avatar"><img src="<?php 
+              $usr = $db->select("usuarios","*",["usr_id"=>$id]);
+               foreach($usr as $key => $usr){
+                 echo $usr["usr_foto"];
+               }
+              ?>" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
-            <h1 class="h5"><?php $id=$_SESSION['USR_ID'];
+            <h1 class="h5"><?php 
               $usr = $db->select("usuarios","*",["usr_id"=>$id]);
                foreach($usr as $key => $usr){
                  echo $usr["usr_nom"];
@@ -109,7 +117,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           <!-- Breadcrumb-->
           <div class="container-fluid">
             <ul class="breadcrumb">
-              <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+              <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
               <li class="breadcrumb-item active">Usuarios        </li>
             </ul>
           </div>
@@ -136,18 +144,24 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         </thead>
                         <tbody>
                           <?php
+                            $status='';
                             $usr = $db->select("usuarios","*");
                               foreach($usr as $key => $usr){
-                                
+                                if($usr["usr_status"]==1){
+                                  $status="checked";
+                                }else{
+                                  $status="";
+                                }
                           ?>
-                         
+                            
                           <tr>
                             <td><?php echo $usr["usr_nom"];?></td>
                             <td><?php echo $usr["usr_email"];?></td>
                             <td><?php echo $usr["usr_fechai"];?></td>
                             <th>
                             <!--<input type="checkbox" class="js-switch" checked />!-->
-                            <label> <input type="checkbox" id="status_usr" class="get_value" value="<?php echo $usr["usr_id"]?> "></label>
+                            
+                            <input id="status_usr"type="checkbox" <?php echo $status;?> class="js-switch" data-id="<?php echo $usr["usr_id"];?>" >
                             </th>
                             <td>
                               <a href="#" class="editar_usr" data-id="<?php echo $usr["usr_id"];?>">
@@ -203,6 +217,21 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
       <script src="js/front.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
       <script src="js/main.js"></script>
+      <script>
+        var elems = document .querySelectorAll (' .js-switch ');
+
+        for ( var i = 0 ; i < elems.length; i ++ ) {
+          var switchery = new Switchery (elems [ i ],{
+            color: 'green',
+            secondaryColor    : 'red',
+            size: 'small'
+          } );
+        }
+        
+
+  
+        
+      </script>
     </body>
 </html>
 <!-- Modal-->
@@ -226,6 +255,12 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           <div class="form-group">
             <label>Password</label>
             <input type="password" id="pass" placeholder="Password" class="form-control">
+          </div>
+          <div class="form-group">
+          <label for="foto">Foto</label>
+                    <input type="file" name="archivo" id="archivo"class="form-control">
+                    <input type="hidden" readonly="readonly" class="form-control" name="foto" id="foto">
+                    <div id="respuesta"></div>
           </div>
         </form>
       </div>

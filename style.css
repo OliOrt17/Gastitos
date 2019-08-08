@@ -41,7 +41,7 @@ Tags: light, white, single page, multipurpose, multi page, custom-colors, Bootst
 /*--------------------*/
 
 body,html{
-  		
+  	scroll-behavior: smooth;	
 }
 
 body {
@@ -398,7 +398,10 @@ img{
 	display: inline;
 	float: left;
 	width: 100%;
-	position: relative;	
+  position: fixed;	
+  top: 0;
+  z-index: 0;
+  left: 0;
 }
 
 #menu-area #navbar {  
@@ -517,7 +520,8 @@ img{
 #slider{
 	display: inline;
 	float: left;
-	width: 100%;
+  width: 100%;
+  margin-top: 80px;
 }
 
 .main-slider {
@@ -2357,7 +2361,10 @@ img{
 }
 
 
-@media(max-width:991px ){
+@media(max-width:990px ){
+  #our-team-content{
+    width: 33.3%;
+  }
 	#menu-area #navbar {
     padding-right: 55px;
   }
