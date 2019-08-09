@@ -89,7 +89,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                foreach($usr as $key => $usr){
                  echo $usr["usr_foto"];
                }
-              ?>" alt="..." class="img-fluid rounded-circle"></div>
+              ?>" alt="Responsive image" class="img-fluid rounded-circle"></div>
             <div class="title">
             <h1 class="h5"><?php 
               $usr = $db->select("usuarios","*",["usr_id"=>$id]);
@@ -105,6 +105,9 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
             <li class="active"><a href="usuarios.php"> <i class="icon-user"></i>Usuarios </a></li>
             <li><a href="categorias.php"> <i class="icon-computer"></i>Categorias </a></li>
             <li><a href="transacciones.php"> <i class="icon-paper-and-pencil"></i>Transacciones </a></li>
+            <li><a href="clientes.php"> <i class="icon-user"></i>clientes </a></li>
+            <li ><a href="proyectos.php"> <i class="icon-computer"></i>proyectos</a></li>
+            <li ><a href="tareas.php"> <i class="icon-paper-and-pencil"></i>Tareas</a></li>
         </nav>
         <!-- Sidebar Navigation end-->
         <div class="page-content">
