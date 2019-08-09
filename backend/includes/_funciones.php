@@ -456,10 +456,10 @@
     header('Content-type: application/json; charset=utf-8');
     echo json_encode($data);*/
     $data = array();
-    $conpassword=$db->select("usuarios","*",["usr_password"=>$password]);#consulta para la contraseña
-    $conuser=$db->select("usuarios","*",["usr_email"=>$user]);#consulta para usuario
-
-    if($conpassword && $conuser){
+    $conpassword=$db->get("usuarios","*",["usr_password"=>$password]);#consulta para la contraseña
+    $conuser=$db->get("usuarios","*",["usr_email"=>$user]);#consulta para usuario
+    $constatus=$db->get("usuarios","*",["usr_email"=>$user,"usr_status"=>1]);#consulta para usuario
+    if($conpassword && $conuser && $constatus){
       $data['status'] = 1;
       $type=$db->select("usuarios","*",["AND"=>["usr_email"=>$user,"usr_password"=>$password]]);
       create_session($user,$type);
@@ -467,6 +467,8 @@
       $data['status'] = 0;
     }elseif(!$conpassword){
       $data['status'] = 2;
+    }elseif(!$constatus){
+      $data['status'] = 3;
     }
 
     

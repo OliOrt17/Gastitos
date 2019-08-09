@@ -201,8 +201,10 @@ $("#login").on("click",function(e){
                   setTimeout(function(){ location.href='dashboard/index.php'; }, 2000);
                   $.notify("Exito","success");
                   $.notify("espere un momento", "info");
-                }else{
+                }else if(data.status==2){
                   $.notify("contraseña incorreta","error");
+                }else{
+                  $.notify("Tu cuenta esta inactiva, comuniquese con el administrador","error");
                 }
             }
         })
