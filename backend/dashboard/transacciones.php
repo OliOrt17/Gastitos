@@ -293,7 +293,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
           </div>
           <div class="form-group">
             <label>Descripcion</label>
-            <input type="text" id="descripcion" placeholder="Tipo" class="form-control">
+            <input type="text" id="descripcion" placeholder="Descripcion" class="form-control">
           </div>
         </form>
       </div>
