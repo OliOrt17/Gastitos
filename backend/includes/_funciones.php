@@ -196,7 +196,7 @@
     extract($_POST);
 
 
-      $editar=$db ->update("transacciones",["trs_tipo" => $tipo,
+      $editar=$db ->update("transacciones",["cat_id" => $tipo,
       "trs_descripcion" =>$descripcion,
       "trs_cantidad" => $cantidad,
       "tps_id"=>$categoria,
