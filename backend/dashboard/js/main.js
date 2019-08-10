@@ -975,5 +975,148 @@ $("#tipo").change(function(){
  $("#categoria").val(categoria);
 });
 
+//Clientes
+$(".eliminar_cli").on("click", function(e){
+  e.preventDefault();
+
+let id=$(this).data("id");
+let obj = {
+      "accion" : "eliminar_cli",
+      "id" : id
+  }
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "¡No podrás revertir esto!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Registro eliminado!'
+  }).then((result) => {
+    if (result.value) {
+      $.ajax({
+        url: "../includes/_funciones.php",
+        type: "POST",
+        dataType: "json",
+        data: obj,
+        success: function(data){
+          if(data==1){
+            location.reload();
+            
+            Swal.fire(
+              'BOOOM!',
+              'Registro eliminado',
+              'success'
+            )
+            
+          }
+        }
+      })
+
+    }else{
+      Swal.fire({
+        type: 'error',
+        title: 'Oops...',
+        text: 'Algo salio mal!'
+      })
+    }
+  })
+});
+
+$("#guardar_cli").click(function(){
+  let num=$("#num").val();
+let nombre=$("#nom").val();
+let email=$("#email").val();
+let empresa=$("#empresa").val();
+let sitio=$("#sitio").val();
+let tel=$("#tel").val();
+let ubicacion=$("#ubicacion").val();
+
+let obj={
+  "accion":"insertar_cli",
+  "nombre": nombre,
+  "email":email,
+  "empresa":empresa,
+  "sitio":sitio,
+  "tel":tel,
+  "ubicacion":ubicacion,
+  "num":num
+}
+
+  
+  if($(this).data("edicion")==1){
+    obj["accion"]="editar_cli";
+    obj["id"]=$(this).data("id");
+    $(this).removeData("edicion").removeData("id");
+  }if(nombre==""){
+    alert("No dejes campos vacios");
+    return;
+  }else{
+    $.ajax({
+      url: "../includes/_funciones.php",
+      type: "POST",
+      dataType: "json",
+      data: obj,
+      success: function(data){
+        if(data==1){
+          
+          $("#modal").modal("hide");
+          
+          Swal.fire(
+            'Registro exitoso!',
+            'Presione el boton!',
+            'success'
+            
+          )
+          location.reload();
+        }else if(data==2){
+          
+          $("#modal").modal("hide");
+          
+          Swal.fire(
+            'Registro fue actualizado!',
+            'Presione el boton!',
+            'success'
+            
+          )
+          location.reload();
+        }else{
+          
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Algo salio mal!'
+          })
+        }
+
+      }
+    })
+  }
+
+});
+$(document).on("click", ".editar_cli", function(){
+  id=$(this).data("id");
+  obj={
+    "accion" : "consultar_cli",
+    "id" : $(this).data("id")
+  }
+  $.post("../includes/_funciones.php", obj, function(data){
+    $("#nom").val(data.cli_nom);
+$("#email").val(data.cli_email);
+$("#empresa").val(data.cli_empresa);
+$("#sitio").val(data.cli_sitio);
+$("#ubicacion").val(data.cli_ubicacion);
+$("#tel").val(data.cli_numero);
+  }, "JSON");
+
+  $("#guardar_cli").text("Actualizar").data("edicion", 1).data("id", id);
+  $(".modal-title").text("Editar clientes");
+  $("#modal").modal("show");
+
+});
+
+
+
+
 //FIN DOCUMENT READY
 });

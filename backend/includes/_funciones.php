@@ -108,8 +108,78 @@
       case "ingresos":
       ingresos();
       break;
+      //clientes
+      case "insertar_cli":
+      insertar_cli();
+      break;
+      case "editar_cli":
+      editar_cli();
+      break;
+      case "consultar_cli":
+      consultar_cli();
+      break;
+      case "eliminar_cli":
+      eliminar_cli();
+      break;
     }
   }
+
+    //clientes
+    function insertar_cli(){
+      global $db;
+      extract($_POST);
+      $insertar=$db ->insert("clientes",["cli_nom" => $nombre,
+                                          "cli_empresa" =>$empresa,
+                                          "cli_sitio" => $sitio,
+                                          "cli_numero"=>$tel,
+                                          "cli_ubicacion"=>$ubicacion,
+                                          "cli_fecha" => date("Y").date("m").date("d"),
+                                          "usr_id"=>$num,
+                                          "cli_email"=>$email]);
+
+      if($insertar){
+        echo 1;
+      }
+    }
+    function eliminar_cli(){
+      global $db;
+      extract($_POST);
+  
+      $eliminar=$db->delete("clientes",["cli_id" => $id]);
+  
+      if($eliminar){
+        echo 1;
+      }
+    }
+    function consultar_cli(){
+      global $db;
+      extract($_POST);
+  
+      $consultar = $db -> get("clientes","*",["AND" => ["cli_id"=>$id]]);
+      echo json_encode($consultar);
+  
+    }
+    function editar_cli(){
+      global $db;
+      extract($_POST);
+  
+  
+        $editar=$db ->update("clientes",["cli_nom" => $nombre,
+        "cli_empresa" =>$empresa,
+        "cli_sitio" => $sitio,
+        "cli_numero"=>$tel,
+        "cli_ubicacion"=>$ubicacion,
+        "cli_fecha" => date("Y").date("m").date("d"),
+        "cli_email"=>$email],
+        ["cli_id"=>$id]);
+        
+        if($editar){
+          echo 2;
+        }
+  
+    }
+
+    //dashboard
     function ingresos(){
       global $db;
       extract($_POST);
@@ -168,6 +238,7 @@
                                         "tps_id"=>$categoria,
                                         "trs_fechai" => date("Y").date("m").date("d"),
                                         "usr_id"=>$num]);
+                                        print_r($insertar);
   
     if($insertar){
       echo 1;
