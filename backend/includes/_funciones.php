@@ -121,7 +121,67 @@
       case "eliminar_cli":
       eliminar_cli();
       break;
+      //proyectos
+      case "insertar_pro":
+      insertar_pro();
+      break;
+      case "editar_pro":
+      editar_pro();
+      break;
+      case "consultar_pro":
+      consultar_pro();
+      break;
+      case "eliminar_pro":
+      eliminar_pro();
+      break;
     }
+  }
+
+  //proyectos
+  function insertar_pro(){
+    global $db;
+    extract($_POST);
+    $insertar=$db ->insert("proyectos",["pro_nom" => $nom,
+                                        "cli_id" =>$cliente,
+                                        "pro_fecha" =>$fecha,
+                                        "pro_precio"=>$precio]);
+
+    if($insertar){
+      echo 1;
+    }
+  }
+  function eliminar_pro(){
+    global $db;
+    extract($_POST);
+
+    $eliminar=$db->delete("proyectos",["pro_id" => $id]);
+
+    if($eliminar){
+      echo 1;
+    }
+  }
+  function consultar_pro(){
+    global $db;
+    extract($_POST);
+
+    $consultar = $db -> get("proyectos","*",["AND" => ["pro_id"=>$id]]);
+    echo json_encode($consultar);
+
+  }
+  function editar_pro(){
+    global $db;
+    extract($_POST);
+   
+      $editar=$db ->update("proyectos",["pro_nom" => $nom,
+    "cli_id" =>$cliente,
+    "pro_fecha" =>$fecha,
+    "pro_precio"=>$precio],
+      ["pro_id"=>$id]);
+      
+      if($editar){
+        echo 2;
+      }
+
   }
 
     //clientes

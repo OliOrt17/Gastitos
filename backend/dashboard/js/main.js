@@ -103,7 +103,6 @@ $(document).ready(function(){
         "email": email,
         "password": password
     }
-    console.log(obj);
     if(email.length==0 ){
       Swal.fire({
         type: 'error',
@@ -1115,7 +1114,137 @@ $("#tel").val(data.cli_numero);
 
 });
 
+//proyectos
+$("#guardar_pro").click(function(){
+  let cliente=$("#cliente").val();
+  let nom=$("#nom").val();
+  let fecha=$("#fecha").val();
+  let precio=$("#precio1").val();
 
+let obj={
+  "accion":"insertar_pro",
+  "nom":nom,
+  "cliente":cliente,
+  "fecha":fecha,
+  "precio":precio
+}
+
+if($(this).data("edicion")==1){
+  obj["accion"]="editar_pro";
+  obj["id"]=$(this).data("id");
+  $(this).removeData("edicion").removeData("id");
+}if(cliente==""){
+  alert("No dejes campos vacios");
+  return;
+}else{
+  $.ajax({
+    url: "../includes/_funciones.php",
+    type: "POST",
+    dataType: "json",
+    data: obj,
+    success: function(data){
+      if(data==1){
+        
+        $("#modal").modal("hide");
+        
+        Swal.fire(
+          'Registro exitoso!',
+          'Presione el boton!',
+          'success'
+          
+        )
+        setTimeout(function(){ location.reload();}, 3000);
+      }else if(data==2){
+        
+        $("#modal").modal("hide");
+        
+        Swal.fire(
+          'Registro fue actualizado!',
+          'Presione el boton!',
+          'success'
+          
+        )
+        setTimeout(function(){ location.reload();}, 3000);
+      }else{
+        
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Algo salio mal!'
+        })
+      }
+
+    }
+  })
+}
+
+});
+$(document).on("click", ".editar_pro", function(){
+let id=$(this).data("id");
+
+let obj={
+  "accion" : "consultar_pro",
+  "id" : $(this).data("id")
+}
+console.log(obj);
+$.post("../includes/_funciones.php", obj, function(data){
+  $("#cliente").val(data.cli_id);
+  $("#nom").val(data.pro_nom);
+  $("#fecha").val(data.pro_fecha);
+  $("#precio1").val(data.pro_precio);
+}, "JSON");
+
+$("#guardar_pro").text("Actualizar").data("edicion", 1).data("id", id);
+$(".modal-title").text("Editar proyecto");
+$("#modal").modal("show");
+
+});
+$(".eliminar_pro").on("click", function(e){
+  e.preventDefault();
+
+let id=$(this).data("id");
+let obj = {
+      "accion" : "eliminar_pro",
+      "id" : id
+  }
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "¡No podrás revertir esto!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Registro eliminado!'
+  }).then((result) => {
+    if (result.value) {
+      $.ajax({
+        url: "../includes/_funciones.php",
+        type: "POST",
+        dataType: "json",
+        data: obj,
+        success: function(data){
+          if(data==1){
+            
+            
+            Swal.fire(
+              'Boooom!',
+              'Registro eliminado.',
+              'success'
+            )
+            setTimeout(function(){ location.reload();}, 3000);
+          }
+        }
+      })
+
+    }else{
+      Swal.fire({
+        type: 'error',
+        title: 'Oops...',
+        text: 'Algo salio mal!'
+      })
+    }
+  })
+});
 
 
 //FIN DOCUMENT READY
