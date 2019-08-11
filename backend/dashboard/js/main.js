@@ -1,4 +1,29 @@
 $(document).ready(function(){
+  var t;
+  var tiempo;
+
+  $('.start-timer-btn').on('click',function(){
+    $('.timer').timer();
+  });
+  $('.resume-timer-btn').on('click',function(){
+    $('.timer').timer("resume");
+  });
+
+  $('.pause-timer-btn').on('click',function(){
+    $('.timer').timer("pause");
+     tiempo=$("#timer").val().split(":").join(".");
+    
+     t=parseFloat(tiempo);
+    console.log(t);
+  });
+
+  $('.remove-timer-btn').on('click',function(){
+    $('.timer').timer("remove");
+    $('.timer').timer();
+
+  });
+
+ 
 
   $("#guardar_gas").click(function(){
     let tipo=$("#tipo1").val();
