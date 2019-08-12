@@ -141,6 +141,9 @@
       case "eliminar_tar":
       eliminar_tar();
       break;
+      case "consultar_tar":
+      consultar_tar();
+      break;
     }
   }
 
@@ -165,6 +168,22 @@
     if($eliminar){
       echo 1;
     }
+  }
+  function consultar_tar(){
+    global $db;
+    extract($_POST);
+
+    $consultar = $db -> get("tareas",["[>]proyectos"=>"pro_id"],
+    ["proyectos.pro_id",
+    "proyectos.cli_id",
+    "proyectos.pro_nom",
+    "tareas.tar_id",
+    "tareas.tar_descripcion",
+    "tareas.tar_tiempo",
+    "tareas.tar_pago"],
+    ["AND" => ["tareas.tar_id"=>$id]]);
+    echo json_encode($consultar);
+
   }
 
   //proyectos

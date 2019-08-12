@@ -145,6 +145,26 @@ $(document).ready(function(){
         }
       })
   });
+  $(document).on("click", ".editar_tar", function(){
+    id=$(this).data("id");
+    obj={
+      "accion" : "consultar_tar",
+      "id" : $(this).data("id")
+    }
+    $.post("../includes/_funciones.php", obj, function(data){
+      
+      $("#timer").val(data.tar_tiempo);
+      $("#cliente").val(data.cli_id);
+      $("#proyecto").val(data.pro_id);
+      $("#descripcion").val(data.tar_descripcion);
+    }, "JSON");
+  
+    $("#guardar_tar").text("Actualizar").data("edicion", 1).data("id", id);
+    $(".modal-title").text("Editar tarea");
+    $("#modal").modal("show");
+    $(".resume-timer-btn").hide();
+  
+  });
 
 
   //gastos
