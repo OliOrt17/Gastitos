@@ -253,13 +253,14 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             $cat = $db->select("clientes","*"); 
                             foreach ($cat as $key => $cat) {
                         ?>
-                                <option  value="<?php echo $cat["cli_id"]?>"><?php echo $cat["cli_nom"]?></option>
+                                <option data-cliente="<?php echo $cat["cli_id"]?>" value="<?php echo $cat["cli_id"]?>"><?php echo $cat["cli_nom"]?></option>
                         <?php
                             }
                         ?>
                    </select>
           </div>
           <div class="form-group" >
+            
           <label>Proyectos</label>
             <select id="proyecto"  class="form-control">
             

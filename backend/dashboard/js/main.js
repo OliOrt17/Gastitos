@@ -2,6 +2,8 @@ $(document).ready(function(){
   var t;
   var tiempo;
   var precio;
+  var to; //Conversion de minutos a segundos
+  var fe; //para insertar tiempo
 
   $('.start-timer-btn').on('click',function(){
     $('.timer').timer();
@@ -15,6 +17,27 @@ $(document).ready(function(){
      tiempo=$("#timer").val().split(":").join(".");
     
      t=parseFloat(tiempo);
+     
+     if(tiempo.indexOf('min')!=-1){
+       to=t*60;
+     }if(tiempo.indexOf('sec')!=-1){
+       to=t;
+     }
+ 
+     if(tiempo.indexOf('min')!=-1){
+      if(t<10){
+       fe="00:0"+t.toString().split(".").join(":");
+      }else{
+       fe="00:"+t.toString().split(".").join(":");
+      }
+     }
+     if(tiempo.indexOf('sec')!=-1){
+       if(t<10){
+         fe="00:"+"00:0"+t;
+       }else{
+         fe="00:"+"00:"+t;
+       }
+     }
     
   });
 
@@ -26,32 +49,12 @@ $(document).ready(function(){
 
   //tareas
   $("#guardar_tar").click(function(){
-    let to; //Conversion de minutos a segundos
-    let fe; //para insertar tiempo
-    if(tiempo.indexOf('min')!=-1){
-      to=t*60;
-    }if(tiempo.indexOf('sec')!=-1){
-      to=t;
-    }
-
-    if(tiempo.indexOf('min')!=-1){
-     if(t<10){
-      fe="00:0"+t.toString().split(".").join(":");
-     }else{
-      fe="00:"+t.toString().split(".").join(":");
-     }
-    }
-    if(tiempo.indexOf('sec')!=-1){
-      if(t<10){
-        fe="00:"+"00:0"+t;
-      }else{
-        fe="00:"+"00:"+t;
-      }
-    }
+ 
     
     let cliente=$("#cliente").val();
     let proyecto=$("#proyecto").val();
     let descripcion=$("#descripcion").val();
+   let tiempo=fe;
     precio = precio/3600;
     
     let pago = precio*to;
@@ -60,10 +63,15 @@ $(document).ready(function(){
       "accion":"insertar_tar",
       "cliente":cliente,
       "proyecto":proyecto,
-      "fe":fe,
+      "fe":tiempo,
       "descripcion":descripcion,
       "pago":pago
       
+    }
+    if($(this).data("edicion")==1){
+      obj["accion"]="editar_tar";
+      obj["id"]=$(this).data("id");
+      $(this).removeData("edicion").removeData("id");
     }
     $.ajax({
       url: "../includes/_funciones.php",
@@ -82,8 +90,18 @@ $(document).ready(function(){
             
           )
           setTimeout(function(){ location.reload();}, 3000);
+        }else if(data==2){
+          location.reload();
+            $("#modal").modal("hide");
+            
+            Swal.fire(
+              'Registro fue actualizado!',
+              'Presione el boton!',
+              'success'
+              
+            )
+         
         }else{
-          
           Swal.fire({
             type: 'error',
             title: 'Oops...',
@@ -95,7 +113,11 @@ $(document).ready(function(){
     })
   
   });
-
+  $("#cliente").change(function(){
+    let cliente=$(this).find("option:selected").data("cliente");
+    console.log(cliente);
+    
+  });
   $("#proyecto").change(function(){
     precio=$(this).find("option:selected").data("proyecto");
   });
@@ -146,23 +168,27 @@ $(document).ready(function(){
       })
   });
   $(document).on("click", ".editar_tar", function(){
+    
     id=$(this).data("id");
     obj={
       "accion" : "consultar_tar",
       "id" : $(this).data("id")
     }
+    
     $.post("../includes/_funciones.php", obj, function(data){
-      
-      $("#timer").val(data.tar_tiempo);
       $("#cliente").val(data.cli_id);
-      $("#proyecto").val(data.pro_id);
       $("#descripcion").val(data.tar_descripcion);
+      $("#timer").val(data.tar_tiempo);
+      fe=data.tar_tiempo;
+     
     }, "JSON");
   
     $("#guardar_tar").text("Actualizar").data("edicion", 1).data("id", id);
-    $(".modal-title").text("Editar tarea");
+    $(".modal-title").text("Editar tareas");
+    
     $("#modal").modal("show");
     $(".resume-timer-btn").hide();
+    $(".start-timer-btn").hide();
   
   });
 

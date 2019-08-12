@@ -144,6 +144,9 @@
       case "consultar_tar":
       consultar_tar();
       break;
+      case "editar_tar":
+      editar_tar();
+      break;
     }
   }
 
@@ -158,6 +161,20 @@
     if($insertar){
       echo 1;
     }
+  }
+  function editar_tar(){
+    global $db;
+    extract($_POST);
+   
+      $editar=$db ->update("tareas",["pro_id"=>$proyecto,
+      "tar_tiempo"=>$fe,"tar_descripcion"=>$descripcion,
+      "tar_pago"=>$pago],
+      ["tar_id"=>$id]);
+      
+      if($editar){
+        echo 2;
+      }
+
   }
   function eliminar_tar(){
     global $db;
