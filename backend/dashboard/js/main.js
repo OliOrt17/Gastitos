@@ -81,7 +81,7 @@ $(document).ready(function(){
             'success'
             
           )
-         // setTimeout(function(){ location.reload();}, 3000);
+          setTimeout(function(){ location.reload();}, 3000);
         }else{
           
           Swal.fire({
@@ -98,8 +98,56 @@ $(document).ready(function(){
 
   $("#proyecto").change(function(){
     precio=$(this).find("option:selected").data("proyecto");
-  })
+  });
+  $(".eliminar_tar").on("click", function(){
+  
 
+    let id=$(this).data("id");
+    let obj = {
+          "accion" : "eliminar_tar",
+          "id" : id
+      }
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás revertir esto!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Registro eliminado!'
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+            url: "../includes/_funciones.php",
+            type: "POST",
+            dataType: "json",
+            data: obj,
+            success: function(data){
+              if(data==1){
+                location.reload();
+                
+                Swal.fire(
+                  'Booom!',
+                  'Registro eliminado.',
+                  'success'
+                )
+                
+              }
+            }
+          })
+  
+        }else{
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Algo salio mal!'
+          })
+        }
+      })
+  });
+
+
+  //gastos
   $("#guardar_gas").click(function(){
     let tipo=$("#tipo1").val();
     let cantidad=$("#cantidad1").val();

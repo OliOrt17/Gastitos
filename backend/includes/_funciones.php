@@ -138,6 +138,9 @@
       case "insertar_tar":
       insertar_tar();
       break;
+      case "eliminar_tar":
+      eliminar_tar();
+      break;
     }
   }
 
@@ -150,6 +153,16 @@
     "tar_pago"=>$pago]);
 
     if($insertar){
+      echo 1;
+    }
+  }
+  function eliminar_tar(){
+    global $db;
+    extract($_POST);
+
+    $eliminar=$db->delete("tareas",["tar_id" => $id]);
+
+    if($eliminar){
       echo 1;
     }
   }
