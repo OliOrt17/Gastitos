@@ -134,6 +134,23 @@
       case "eliminar_pro":
       eliminar_pro();
       break;
+      //tareas
+      case "insertar_tar":
+      insertar_tar();
+      break;
+    }
+  }
+
+  //tareas
+  function insertar_tar(){
+    global $db;
+    extract($_POST);
+    $insertar=$db->insert("tareas",["pro_id"=>$proyecto,
+    "tar_tiempo"=>$fe,"tar_descripcion"=>$descripcion,
+    "tar_pago"=>$pago]);
+
+    if($insertar){
+      echo 1;
     }
   }
 

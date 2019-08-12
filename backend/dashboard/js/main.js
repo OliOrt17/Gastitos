@@ -1,6 +1,7 @@
 $(document).ready(function(){
   var t;
   var tiempo;
+  var precio;
 
   $('.start-timer-btn').on('click',function(){
     $('.timer').timer();
@@ -14,7 +15,7 @@ $(document).ready(function(){
      tiempo=$("#timer").val().split(":").join(".");
     
      t=parseFloat(tiempo);
-    console.log(t);
+    
   });
 
   $('.remove-timer-btn').on('click',function(){
@@ -23,7 +24,81 @@ $(document).ready(function(){
 
   });
 
- 
+  //tareas
+  $("#guardar_tar").click(function(){
+    let to; //Conversion de minutos a segundos
+    let fe; //para insertar tiempo
+    if(tiempo.indexOf('min')!=-1){
+      to=t*60;
+    }if(tiempo.indexOf('sec')!=-1){
+      to=t;
+    }
+
+    if(tiempo.indexOf('min')!=-1){
+     if(t<10){
+      fe="00:0"+t.toString().split(".").join(":");
+     }else{
+      fe="00:"+t.toString().split(".").join(":");
+     }
+    }
+    if(tiempo.indexOf('sec')!=-1){
+      if(t<10){
+        fe="00:"+"00:0"+t;
+      }else{
+        fe="00:"+"00:"+t;
+      }
+    }
+    
+    let cliente=$("#cliente").val();
+    let proyecto=$("#proyecto").val();
+    let descripcion=$("#descripcion").val();
+    precio = precio/3600;
+    
+    let pago = precio*to;
+    
+    let obj={
+      "accion":"insertar_tar",
+      "cliente":cliente,
+      "proyecto":proyecto,
+      "fe":fe,
+      "descripcion":descripcion,
+      "pago":pago
+      
+    }
+    $.ajax({
+      url: "../includes/_funciones.php",
+      type: "POST",
+      dataType: "json",
+      data: obj,
+      success: function(data){
+        if(data==1){
+          
+          $("#modal").modal("hide");
+          
+          Swal.fire(
+            'Registro exitoso!',
+            'Presione el boton!',
+            'success'
+            
+          )
+         // setTimeout(function(){ location.reload();}, 3000);
+        }else{
+          
+          Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Algo salio mal!'
+          })
+        }
+  
+      }
+    })
+  
+  });
+
+  $("#proyecto").change(function(){
+    precio=$(this).find("option:selected").data("proyecto");
+  })
 
   $("#guardar_gas").click(function(){
     let tipo=$("#tipo1").val();
