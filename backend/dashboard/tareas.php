@@ -130,7 +130,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                 <div class="col-lg-12">
                   <div class="block">
                     <div class="title">
-                      <strong>Proyectos &nbsp; &nbsp;</strong>
+                      <strong>Tareas &nbsp; &nbsp;</strong>
                       <button id="nuevo" type="button" class="btn btn-primary">Nuevo</button>
                     </div>
                     <div class="table-responsive">
@@ -141,6 +141,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             <th>Proyecto</th>
                             <th>Descripcion</th>
                             <th>Tiempo</th>
+                            <th>Pago</th>
                             <th>Editar</th>
                             <th>Eliminar</th>
                           </tr>
@@ -158,7 +159,8 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             "proyectos.pro_nom",
                             "tareas.tar_id",
                             "tareas.tar_descripcion",
-                            "tareas.tar_tiempo"
+                            "tareas.tar_tiempo",
+                            "tareas.tar_pago"
                               
 
                             ]);
@@ -173,6 +175,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             <td><?php echo $tar["tar_descripcion"];?></td>
                             
                             <td><?php echo $tar["tar_tiempo"];?></td>
+                            <td><?php echo $tar["tar_pago"];?></td>
                             <td>
                               <a href="#" class="editar_tar" data-id="<?php echo $tar["tar_id"];?>">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -265,7 +268,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             $cat = $db->select("proyectos","*"); 
                             foreach ($cat as $key => $cat) {
                         ?>
-                                <option  value="<?php echo $cat["pro_id"]?>"><?php echo $cat["pro_nom"]?></option>
+                                <option  data-proyecto="<?php echo $cat["pro_precio"]?>"value="<?php echo $cat["pro_id"]?>"><?php echo $cat["pro_nom"]?></option>
                         <?php
                             }
                         ?>
@@ -274,7 +277,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
 
           <div class="form-group">
             <label>Tiempo</label>
-            <input type="text" id="timer" name="timer"  placeholder="0" class="form-control timer">
+            <input type="text" id="timer" name="timer"  placeholder="0" class="form-control timer" disabled>
             <br>
             <div center class="col">
                 <button type="button" class="btn btn-success start-timer-btn">
@@ -296,6 +299,11 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                
             </div><!--fin -->
            
+          </div>
+
+          <div class="form-group">
+            <label>Descripcion</label>
+            <input type="type" id="descripcion" placeholder="Descripcion" class="form-control">
           </div>
          
         </form>
