@@ -48,6 +48,23 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   </head>
   <body>
     <body>
+      <?php
+     
+        $tar=$db->select("tareas",["tar_tiempo","tar_id"],["tar_status"=>1]);
+        foreach($tar as $key => $tar){
+          if($tar){
+            echo '  <div class="tareaActiva" >
+          <h1>Empezaste a las: <strong>'.$tar["tar_tiempo"].'</strong></h1> 
+          
+          <button data-id='.$tar["tar_id"].' id="guardar_tiempo">Detener</button>
+          
+           </div>';
+          }
+        }
+       
+      
+      ?>
+  
       <header class="header">
         <nav class="navbar navbar-expand-lg">
           <div class="search-panel">
@@ -148,34 +165,25 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         </thead>
                         <tbody>
                           <?php
-                            $tar = $db->select("tareas",
-                            [
-                              "[>]proyectos"=>"pro_id"
+                            $tar = $db->query(
+                              "SELECT tareas.tar_id,tareas.tar_descripcion, tareas.tar_dif, tareas.tar_precio,proyectos.pro_nom, cliente.cli_nom
+                              FROM tareas
+                              inner join proyectos using(pro_id)
+                              inner join cliente on proyectos.cli_id = cliente.cli_id
+                              where tareas.tar_status=0 "
 
-                            ],
-                            [ 
-                            "proyectos.pro_id",
-                            "proyectos.cli_id",
-                            "proyectos.pro_nom",
-                            "tareas.tar_id",
-                            "tareas.tar_descripcion",
-                            "tareas.tar_tiempo",
-                            "tareas.tar_pago"
-                              
-
-                            ]);
-                            
+                            )->fetchAll();
                             foreach($tar as $key => $tar){
                               
                           ?>
                             
                           <tr>
-                            <td><?php echo $tar["cli_id"];?></td>
+                            <td><?php echo $tar["cli_nom"];?></td>
                             <td><?php echo $tar["pro_nom"];?></td>
                             <td><?php echo $tar["tar_descripcion"];?></td>
                             
-                            <td><?php echo $tar["tar_tiempo"];?></td>
-                            <td><?php echo $tar["tar_pago"];?></td>
+                            <td><?php echo round($tar["tar_dif"]/3600,2)." HRS";?></td>
+                            <td><?php echo "$".round($tar["tar_precio"],2);?></td>
                             <td>
                               <a href="#" class="editar_tar" data-id="<?php echo $tar["tar_id"];?>">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -245,62 +253,53 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
         <p></p>
         <form id="formulario">
         <div class="form-group" >
+            
+            <label>Proyectos</label>
+              <select id="proyecto"  class="form-control">
+              
+                     <option value="0">Seleccionar Proyectos</option>
+                      <?php 
+                              $cat =$db->select("proyectos",
+                              [
+                                "[>]cliente"=>"cli_id"
+  
+                              ],
+                              [ 
+                              "cliente.usr_id",
+                              "proyectos.pro_id",
+                              "proyectos.pro_nom",
+                              "proyectos.pro_fecha",
+                              "proyectos.pro_precio",
+                             " cliente.cli_id"
+                                ],
+                                ["cliente.usr_id"=>$id
+  
+                              ]);
+                              
+                              foreach ($cat as $key => $cat) {
+                          ?>
+                                  <option  data-proyecto="<?php echo $cat["cli_id"]?>"value="<?php echo $cat["pro_id"]?>"><?php echo $cat["pro_nom"]?></option>
+                          <?php
+                              }
+                          ?>
+                     </select>
+            </div>
+        <div class="form-group" >
           <label>Clientes</label>
-            <select id="cliente"  class="form-control">
+            <select id="cliente"  class="form-control" disabled>
             
                    <option value="0">Seleccionar Cliente</option>
                     <?php 
-                            $cat = $db->select("clientes","*"); 
+                            $cat = $db->select("cliente","*",["usr_id"=>$id]); 
                             foreach ($cat as $key => $cat) {
                         ?>
-                                <option data-cliente="<?php echo $cat["cli_id"]?>" value="<?php echo $cat["cli_id"]?>"><?php echo $cat["cli_nom"]?></option>
+                                <option  value="<?php echo $cat["cli_id"]?>"><?php echo $cat["cli_nom"]?></option>
                         <?php
                             }
                         ?>
                    </select>
           </div>
-          <div class="form-group" >
-            
-          <label>Proyectos</label>
-            <select id="proyecto"  class="form-control">
-            
-                   <option value="0">Seleccionar Proyectos</option>
-                    <?php 
-                            $cat = $db->select("proyectos","*"); 
-                            foreach ($cat as $key => $cat) {
-                        ?>
-                                <option  data-proyecto="<?php echo $cat["pro_precio"]?>"value="<?php echo $cat["pro_id"]?>"><?php echo $cat["pro_nom"]?></option>
-                        <?php
-                            }
-                        ?>
-                   </select>
-          </div>
-
-          <div class="form-group">
-            <label>Tiempo</label>
-            <input type="text" id="timer" name="timer"  placeholder="0" class="form-control timer" disabled>
-            <br>
-            <div center class="col">
-                <button type="button" class="btn btn-success start-timer-btn">
-                <i class="fa fa-play"></i> Iniciar
-                </button>
-
-                <button type="button" class="btn btn-info resume-timer-btn">
-                <i class="fa fa-forward"></i> Continuar
-                </button>
-
-                <button type="button" class="btn btn-dark pause-timer-btn">
-                <i class="fa fa-pause"></i> Pausa
-                </button>
-
-                <button type="button" class="btn btn-primary remove-timer-btn">
-                <i class="fa fa-repeat"></i> Reiniciar
-                </button>
-
-               
-            </div><!--fin -->
-           
-          </div>
+         
 
           <div class="form-group">
             <label>Descripcion</label>
