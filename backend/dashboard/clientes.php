@@ -148,7 +148,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         <tbody>
                           <?php
                             $status='';
-                            $cli = $db->select("clientes","*");
+                            $cli = $db->select("cliente","*",["usr_id"=>$id]);
                             foreach($cli as $key => $cli){
                               
                           ?>
