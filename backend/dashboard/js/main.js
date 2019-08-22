@@ -1,71 +1,39 @@
 $(document).ready(function(){
-  var t;
-  var tiempo;
-  var precio;
-  var to; //Conversion de minutos a segundos
-  var fe; //para insertar tiempo
 
-  $('.start-timer-btn').on('click',function(){
-    $('.timer').timer();
-  });
-  $('.resume-timer-btn').on('click',function(){
-    $('.timer').timer("resume");
-  });
-
-  $('.pause-timer-btn').on('click',function(){
-    $('.timer').timer("pause");
-     tiempo=$("#timer").val().split(":").join(".");
+  $("#guardar_tiempo").click(function(){
+    let id=$(this).data("id");
     
-     t=parseFloat(tiempo);
-     
-     if(tiempo.indexOf('min')!=-1){
-       to=t*60;
-     }if(tiempo.indexOf('sec')!=-1){
-       to=t;
-     }
- 
-     if(tiempo.indexOf('min')!=-1){
-      if(t<10){
-       fe="00:0"+t.toString().split(".").join(":");
-      }else{
-       fe="00:"+t.toString().split(".").join(":");
+    let obj={
+      "accion":"tiempo",
+      "id":id
+    }
+    $.ajax({
+      url: "../includes/_funciones.php",
+      type: "POST",
+      dataType: "json",
+      data: obj,
+      success: function(data){
+        if(data==1){
+          alert("yii");
+        }
       }
-     }
-     if(tiempo.indexOf('sec')!=-1){
-       if(t<10){
-         fe="00:"+"00:0"+t;
-       }else{
-         fe="00:"+"00:"+t;
-       }
-     }
+    })
     
-  });
-
-  $('.remove-timer-btn').on('click',function(){
-    $('.timer').timer("remove");
-    $('.timer').timer();
-
-  });
+  })
 
   //tareas
   $("#guardar_tar").click(function(){
- 
     
-    let cliente=$("#cliente").val();
+    
+    
     let proyecto=$("#proyecto").val();
     let descripcion=$("#descripcion").val();
-   let tiempo=fe;
-    precio = precio/3600;
     
-    let pago = precio*to;
     
     let obj={
       "accion":"insertar_tar",
-      "cliente":cliente,
       "proyecto":proyecto,
-      "fe":tiempo,
-      "descripcion":descripcion,
-      "pago":pago
+      "descripcion":descripcion
       
     }
     if($(this).data("edicion")==1){
@@ -80,7 +48,7 @@ $(document).ready(function(){
       data: obj,
       success: function(data){
         if(data==1){
-          
+          location.reload();
           $("#modal").modal("hide");
           
           Swal.fire(
@@ -89,7 +57,7 @@ $(document).ready(function(){
             'success'
             
           )
-          setTimeout(function(){ location.reload();}, 3000);
+          
         }else if(data==2){
           location.reload();
             $("#modal").modal("hide");
@@ -113,13 +81,14 @@ $(document).ready(function(){
     })
   
   });
-  $("#cliente").change(function(){
-    let cliente=$(this).find("option:selected").data("cliente");
-    console.log(cliente);
-    
-  });
+  
   $("#proyecto").change(function(){
-    precio=$(this).find("option:selected").data("proyecto");
+   let proyecto= $(this).find("option:selected").data("proyecto");
+    $("#cliente").val(proyecto);
+  
+    let precios=$("#proyecto").val();
+
+    $("#valor").val(precios);
   });
   $(".eliminar_tar").on("click", function(){
   
@@ -178,8 +147,6 @@ $(document).ready(function(){
     $.post("../includes/_funciones.php", obj, function(data){
       $("#cliente").val(data.cli_id);
       $("#descripcion").val(data.tar_descripcion);
-      $("#timer").val(data.tar_tiempo);
-      fe=data.tar_tiempo;
      
     }, "JSON");
   

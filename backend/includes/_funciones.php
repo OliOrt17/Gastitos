@@ -147,16 +147,52 @@
       case "editar_tar":
       editar_tar();
       break;
+      case "tiempo":
+      tiempo();
+      break;
     }
   }
 
+  function tiempo(){
+    global $db;
+    extract($_POST);
+    date_default_timezone_set('America/Cancun');
+    $actual = date("Y-m-d H:i:s");
+    $insertar=$db->update("tareas",["tar_final"=>$actual],["tar_id"=>$id]);
+
+    if($insertar){
+      $con=$db->query(
+        "SELECT  TIMESTAMPDIFF(SECOND, tar_tiempo,tar_final) as tiempo, tar_pago
+        FROM tareas
+        where tar_status=1 "
+
+      )->fetchAll();
+        if($con){
+          foreach($con as $key => $con){
+            $tiempo=$con["tiempo"];
+            $pago=$con["tar_pago"]/3600;
+          }
+          $t=$tiempo*$pago;
+          $ultima=$db->update("tareas",["tar_precio"=>$t,"tar_dif"=>$tiempo,"tar_status"=>0],["tar_status"=>1]);
+
+          if($ultima){
+            echo 1;
+          }
+      }
+    }
+  }
   //tareas
   function insertar_tar(){
     global $db;
     extract($_POST);
+    date_default_timezone_set('America/Cancun');
+    $time=date("Y-m-d H:i:s");
+    $con=$db->select("proyectos",["pro_precio"],["pro_id"=>$proyecto]);
+    foreach($con as $key => $con){
+      $valor=$con["pro_precio"];
+    }
     $insertar=$db->insert("tareas",["pro_id"=>$proyecto,
-    "tar_tiempo"=>$fe,"tar_descripcion"=>$descripcion,
-    "tar_pago"=>$pago]);
+    "tar_tiempo"=> $time,"tar_descripcion"=>$descripcion,"tar_pago"=>$valor, "tar_status"=>1]);
 
     if($insertar){
       echo 1;
@@ -254,7 +290,7 @@
     function insertar_cli(){
       global $db;
       extract($_POST);
-      $insertar=$db ->insert("clientes",["cli_nom" => $nombre,
+      $insertar=$db ->insert("cliente",["cli_nom" => $nombre,
                                           "cli_empresa" =>$empresa,
                                           "cli_sitio" => $sitio,
                                           "cli_numero"=>$tel,
