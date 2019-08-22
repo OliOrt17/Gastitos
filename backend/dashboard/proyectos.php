@@ -147,22 +147,13 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         </thead>
                         <tbody>
                           <?php
-                            $pro = $db->select("proyectos",
-                            [
-                              "[>]clientes"=>"cli_id"
+                            $pro = $db->query(
+                              "SELECT proyectos.pro_nom, proyectos.pro_fecha, cliente.cli_id, cliente.cli_nom,proyectos.pro_precio, cliente.usr_id
+                              FROM proyectos
+                              inner join cliente using(cli_id)
+                              where cliente.usr_id=$id"
 
-                            ],
-                            [ "clientes.cli_id",
-                            "clientes.cli_nom",
-                            "clientes.usr_id",
-                            "proyectos.pro_id",
-                            "proyectos.pro_nom",
-                            "proyectos.pro_fecha",
-                            "proyectos.pro_precio"
-                              ],
-                              ["clientes.usr_id"=>$id
-
-                            ]);;
+                            )->fetchAll();
                             
                             foreach($pro as $key => $pro){
                               
@@ -247,7 +238,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
             
                    <option value="0">Seleccionar Cliente</option>
                     <?php 
-                            $cat = $db->select("clientes","*"); 
+                            $cat = $db->select("cliente","*",["usr_id"=>$id]); 
                             foreach ($cat as $key => $cat) {
                         ?>
                                 <option  value="<?php echo $cat["cli_id"]?>"><?php echo $cat["cli_nom"]?></option>
