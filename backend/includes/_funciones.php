@@ -164,7 +164,7 @@
       $con=$db->query(
         "SELECT  TIMESTAMPDIFF(SECOND, tar_tiempo,tar_final) as tiempo, tar_pago
         FROM tareas
-        where tar_status=1 "
+        where tar_id=>$id "
 
       )->fetchAll();
         if($con){
@@ -173,7 +173,7 @@
             $pago=$con["tar_pago"]/3600;
           }
           $t=$tiempo*$pago;
-          $ultima=$db->update("tareas",["tar_precio"=>$t,"tar_dif"=>$tiempo,"tar_status"=>0],["tar_status"=>1]);
+          $ultima=$db->update("tareas",["tar_precio"=>$t,"tar_dif"=>$tiempo,"tar_status"=>0],["tar_id"=>$id]);
 
           if($ultima){
             echo 1;
