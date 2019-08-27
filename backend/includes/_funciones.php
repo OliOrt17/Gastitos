@@ -153,6 +153,7 @@
     }
   }
 
+
   function tiempo(){
     global $db;
     extract($_POST);
@@ -164,7 +165,7 @@
       $con=$db->query(
         "SELECT  TIMESTAMPDIFF(SECOND, tar_tiempo,tar_final) as tiempo, tar_pago
         FROM tareas
-        where tar_id=>$id "
+        where tar_id=$id "
 
       )->fetchAll();
         if($con){
@@ -180,7 +181,8 @@
           }
       }
     }
-  }
+    }
+  
   //tareas
   function insertar_tar(){
     global $db;
@@ -201,10 +203,14 @@
   function editar_tar(){
     global $db;
     extract($_POST);
-   
+    date_default_timezone_set('America/Cancun');
+    $time=date("Y-m-d H:i:s");
+    $con=$db->select("proyectos",["pro_precio"],["pro_id"=>$proyecto]);
+    foreach($con as $key => $con){
+      $valor=$con["pro_precio"];
+    }
       $editar=$db ->update("tareas",["pro_id"=>$proyecto,
-      "tar_tiempo"=>$fe,"tar_descripcion"=>$descripcion,
-      "tar_pago"=>$pago],
+      "tar_tiempo"=> $time,"tar_descripcion"=>$descripcion,"tar_pago"=>$valor, "tar_status"=>1],
       ["tar_id"=>$id]);
       
       if($editar){
