@@ -14,7 +14,14 @@ $(document).ready(function(){
       data: obj,
       success: function(data){
         if(data==1){
-          alert("yii");
+          location.reload();
+          Swal.fire(
+            'Tarea terminada!',
+            'Presione el boton!',
+            'success'
+            
+          )
+          
         }
       }
     })
@@ -146,6 +153,7 @@ $(document).ready(function(){
     
     $.post("../includes/_funciones.php", obj, function(data){
       $("#cliente").val(data.cli_id);
+      $("#proyecto").val(data.pro_id);
       $("#descripcion").val(data.tar_descripcion);
      
     }, "JSON");
