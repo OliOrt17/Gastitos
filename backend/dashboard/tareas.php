@@ -22,7 +22,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Gastitos | Usuarios</title>
+    <title>Gastitos | Tarea</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -50,11 +50,18 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
     <body>
       <?php
      
-        $tar=$db->select("tareas",["tar_tiempo","tar_id"],["tar_status"=>1]);
+        $tar=$db->query(
+          "SELECT tareas.tar_id,tareas.tar_tiempo, tareas.tar_descripcion,  cliente.usr_id
+          FROM tareas
+          inner join proyectos using(pro_id)
+          inner join cliente on proyectos.cli_id = cliente.cli_id
+          where tareas.tar_status=1 and cliente.usr_id=$id"
+
+        )->fetchAll();
         foreach($tar as $key => $tar){
           if($tar){
             echo '  <div class="tareaActiva" >
-          <h1>Empezaste a las: <strong>'.$tar["tar_tiempo"].'</strong></h1> 
+          <h1>El proyecto <strong>'.$tar["tar_descripcion"].'</strong> comenzó <strong>'.$tar["tar_tiempo"].'</strong></h1> 
           
           <button data-id='.$tar["tar_id"].' id="guardar_tiempo">Detener</button>
           
@@ -166,11 +173,11 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                         <tbody>
                           <?php
                             $tar = $db->query(
-                              "SELECT tareas.tar_id,tareas.tar_descripcion, tareas.tar_dif, tareas.tar_precio,proyectos.pro_nom, cliente.cli_nom
+                              "SELECT tareas.tar_id,tareas.tar_descripcion, tareas.tar_dif, tareas.tar_precio,proyectos.pro_nom, cliente.cli_nom, cliente.usr_id
                               FROM tareas
                               inner join proyectos using(pro_id)
                               inner join cliente on proyectos.cli_id = cliente.cli_id
-                              where tareas.tar_status=0 "
+                              where tareas.tar_status=0 and cliente.usr_id=$id "
 
                             )->fetchAll();
                             foreach($tar as $key => $tar){
@@ -182,7 +189,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                             <td><?php echo $tar["pro_nom"];?></td>
                             <td><?php echo $tar["tar_descripcion"];?></td>
                             
-                            <td><?php echo round($tar["tar_dif"]/3600,2)." HRS";?></td>
+                            <td><?php echo round($tar["tar_dif"]/3600,4)." HRS";?></td>
                             <td><?php echo "$".round($tar["tar_precio"],2);?></td>
                             <td>
                               <a href="#" class="editar_tar" data-id="<?php echo $tar["tar_id"];?>">
