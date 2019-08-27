@@ -121,18 +121,25 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                 <div class="statistic-block block">
                   <div class="progress-details d-flex align-items-end justify-content-between">
                     <div class="title">
-                      <div class="icon"><i class="icon-user-1"></i></div><strong>Usuarios</strong>
+                      <div class="icon"><i class="icon-user-1"></i></div><strong>Tarea</strong>
                     </div>
                     <div class="number dashtext-1"><?php 
-              $usr = $db->count("usuarios","*");
-               echo $usr;
+              $tar=$db->query(
+                "SELECT sum(tareas.tar_precio) as precio, cliente.usr_id
+                FROM tareas
+                inner join proyectos using(pro_id)
+                inner join cliente on proyectos.cli_id = cliente.cli_id
+                where tareas.tar_status=0 and cliente.usr_id=$id"
+      
+              )->fetchAll();
+              foreach($tar as $key => $tar){
+                $pre=$tar["precio"];
+              }
+              echo round($pre,2);
                ?></div>
                   </div>
                   <div class="progress progress-template">
-                    <div role="progressbar" style="width: <?php 
-              $usr = $db->count("usuarios","*");
-               echo $usr."%";
-               ?>" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
+                    <div role="progressbar" style="width: 55% "aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
                   </div>
                 </div>
               </div>
@@ -300,6 +307,72 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
                           <tr>
                             <td><?php echo $trs["cat_nom"]."-".$trs["trs_descripcion"];?></td>
                             <th><?php echo $trs["trs_cantidad"];?></th>
+                          </tr>
+                          <?php
+                          }
+                          /*<tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">3</th>
+                            <td>Larry</td>
+                            <td>the Bird</td>
+                            <td>@twitter       </td>
+                          </tr>*/
+                           ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="no-padding-top">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="block">
+                    <div class="title">
+                      <strong>Tareas &nbsp; &nbsp;</strong>
+                     
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table table-striped table-hover" id="table_datos">
+                        <thead>
+                          <tr>
+                            <th>Cliente</th>
+                            <th>Proyecto</th>
+                            <th>Descripcion</th>
+                            <th>Tiempo</th>
+                            <th>Pago</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                            $tar = $db->query(
+                              "SELECT tareas.tar_id,tareas.tar_descripcion, tareas.tar_dif, tareas.tar_precio,proyectos.pro_nom, cliente.cli_nom, cliente.usr_id
+                              FROM tareas
+                              inner join proyectos using(pro_id)
+                              inner join cliente on proyectos.cli_id = cliente.cli_id
+                              where tareas.tar_status=0 and cliente.usr_id=$id "
+
+                            )->fetchAll();
+                            foreach($tar as $key => $tar){
+                              
+                          ?>
+                            
+                          <tr>
+                            <td><?php echo $tar["cli_nom"];?></td>
+                            <td><?php echo $tar["pro_nom"];?></td>
+                            <td><?php echo $tar["tar_descripcion"];?></td>
+                            
+                            <td><?php echo round($tar["tar_dif"]/3600,4)." HRS";?></td>
+                            <td><?php echo "$".round($tar["tar_precio"],2);?></td>
+                            
                           </tr>
                           <?php
                           }
