@@ -22,7 +22,7 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Gastitos | Usuarios</title>
+    <title>Gastitos | Proyectos</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -48,6 +48,29 @@ if(!isset($_COOKIE['lau']) || $_COOKIE['lau']==0){
   </head>
   <body>
     <body>
+    <?php
+     
+        $tar=$db->query(
+          "SELECT tareas.tar_id,tareas.tar_tiempo, tareas.tar_descripcion,  cliente.usr_id
+          FROM tareas
+          inner join proyectos using(pro_id)
+          inner join cliente on proyectos.cli_id = cliente.cli_id
+          where tareas.tar_status=1 and cliente.usr_id=$id"
+
+        )->fetchAll();
+        foreach($tar as $key => $tar){
+          if($tar){
+            echo '  <div class="tareaActiva" >
+          <h1>El proyecto <strong>'.$tar["tar_descripcion"].'</strong> comenzó <strong>'.$tar["tar_tiempo"].'</strong></h1> 
+          
+          <button data-id='.$tar["tar_id"].' id="guardar_tiempo">Detener</button>
+          
+           </div>';
+          }
+        }
+       
+      
+      ?>
       <header class="header">
         <nav class="navbar navbar-expand-lg">
           <div class="search-panel">
